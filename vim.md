@@ -32,6 +32,8 @@
 
 - `:bdelete fileName` to delete a buffer
 
+- `:%bdelete` Delete all buffers except current one
+
   
 
 ## Find and Replace:
