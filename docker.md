@@ -1,37 +1,25 @@
-imageCurrent setup
-
-- Installed docker desktop app. so use it to view and manage docker containers
-
-
-
-
-
 # Docker
 
-commands:
+## Installation
 
-- `docker run nginx` If the image already exists then run the image/container. if there is no image it downloads from hub
+- Easy way to get started with docker is to install Docker Destop app. Need to install docker-compose separately if you are using linux, latest version of desktop app have an option to do just that in settings. 
+
+  
+
+## commands
+
+- `docker run nginx` If the image already exists then runs the image/container. if there is no image it downloads from hub
 - `docker ps` list out running containers
-- `docker ps -a`   - List out running containers
+- `docker ps -a`   - List out all running containers
 - `docker stop dockername`
 - `docker rm dockername` to remove a container permanently
 - `docker images` list out downloaded images
 - `docker rmi nginx` to remove an image. make sure there are no running containers off that image.
 - `docker pull nginx` to only pull the image from hub and not run.
 
-
-
-attach mode -> attached to terminal 
-
-`docker run nginx`
-
-
-
-Detached mode 
-
-`docker run -d nginx`
-
-`docker attach hash`
+- We can run docker from terminal in either attached or detached mode
+  - Detached mode  `docker run -d nginx`
+  - start in attach mode with `-d` flag or attach to an already running container using its hash `docker attach hash`
 
 
 
@@ -43,12 +31,11 @@ Running with port forwarding
 
 `docker run -p LOCAL_PORT:CONTAINER_PORT imageID`
 
-i
+
 
 ### Docker compose
 
 - https://docs.docker.com/compose/
-- 
 
 `docker-compose build`
 
@@ -72,3 +59,4 @@ i
 - https://linuxhandbook.com/remove-docker-images/\
 - https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 - https://auth0.com/blog/use-docker-to-create-a-node-development-environment/
+
