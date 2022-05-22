@@ -42,6 +42,12 @@ Running with port forwarding
 
 
 
+### types of volumes
+
+- Anonymized volume - has only path in the container ex: `/app/node_modules`
+- bind volumes contains two paths separated by colon ex : `/path/in/host:/path/in/container`
+- named volumes contains only one path and name ex: `name-of-volume:/path/in/container`     used mostly to store mongoDB data directory  `mongo-db:/data/db`. **Note: ** need to declare the volume before using by listing in volumes at root level.
+
 ### Docker compose
 
 - https://docs.docker.com/compose/
@@ -54,7 +60,19 @@ Running with port forwarding
 
 
 
-## Docker with NodeJs
+### Networking
+
+- `docker inspect container-name` gives more info about container
+- `docker network ls`  - List of all available networks including default ones bundled with docker
+- 
+
+
+
+-------
+
+
+
+## Docker with ONE container - node server
 
 ### Dockerfile
 
@@ -109,8 +127,8 @@ CMD ["npm", "run", "dev"]
     - For windows powershell `-v ${pwd}:app`
   - Cause we are syncing  and running from containe, we dont need node_modules folder but deleting it in local, deletes it in container. So prevent this we run add another volume to preserve nod_modules using anothe -v flag. `docker run -v ~/path/to/project:/app -v /app/node_modules -p 8080:3000 -d --name node-app node-app-image`
   - **NOTE**: docker volumes takes specifity as precedence. meaning if the path is more specific then it overrides other -v flag in our case bind mount. 
-  - **NOTE:** Bind volume is a two way sync. meaning any new file added in container reflects your local machine folder. Address this by adding read only sync. 
-  - Make read only by adding `:ro` container path. ` docker run -v ~/path/to/project:/app:ro -v /app/node_modules -p 8080:3000 -d --name node-app node-app-image`
+  - **NOTE:** Bind volume is a two way sync. meaning any new file added in container reflects your local machine folder. Address this isssue by adding read only sync. 
+  - Make read only by adding `:ro` suffix tocontainer path, makes the directory in container readonly. ` docker run -v ~/path/to/project:/app:ro -v /app/node_modules -p 8080:3000 -d --name node-app node-app-image`
 - Pass environment variable using `-e` or `--env`  flag. Usage `--env PORT=4000`
   - Standard convention to store  many env variable is by using `.env` file
 - At this point the command to run is long with  many flags and all. To fix this and also manage multiple docker images we use **docker-compose**
@@ -155,6 +173,55 @@ This can be done either by using mulitple docker-compose yaml files or by using 
   - To not install dev dependencies in the prod build follow this [workaround](https://youtu.be/9zUHg7xjIqQ?t=6062)
 
 
+
+
+
+## Working with multiple Containers
+
+Here we will try to use **Express server** and **MongoDB** together.
+
+### `docker-compose.yml`
+
+```yaml
+verison: "3"
+services:				# Each container is referred to as a service
+	node-app:			# user defined name for a container
+		depends_on:
+		 - mongo		# name of the service this service depends on
+		build: .		# specify what image to build ie. get dockerfile
+        ports:			# provide list of ports to open
+        	- "3000:3000"
+        volumes:
+        	- ./:/app	# we can pass ro flag and use relative paths
+        	- /app/node_modules
+        # environment:
+        #	- PORT=300
+        env_file:
+        	- ./.env
+	mongo: 
+		image: mongo		# get the latest image from hub
+		environment:		# Need these two envs to initiate DB
+		 - MONGO_INITDB_ROOT_USERNAME=pranay
+		 - MONGO_INITDB_ROOT_PASSWORD=mypassword
+		volumes:
+		 - mongo-db:/data/db	# here mongo-db is the name of the volume
+		 
+		 
+volumes:
+ mongo-db:					# Declaring a named volume
+		
+        	
+```
+
+- To store data persistently in a container we use volumes, more specifically named volumes. Why named? so that we don't delete them accidentally as anonymized volumes are referred using hash, so we need a way to differentiate  - named volume. See the above yaml file to see how name volume  is implemented.
+
+- `docker-compose up` the containers and run `docker exec -it  mongo-container-name -u "username" -p "password"` to directly get into mongo shell
+- To delete all anonymous volumes expect named volumes, up the containers and run `docker volumes --prune` this will delete all unused volumes, keeping our named volume as it is being used. 
+- Now setup our express application to connect to our mongodb using mongoose - [refer freecodecamp yt](https://youtu.be/9zUHg7xjIqQ?t=7420).
+  - connection string looks like this `mongodb://username:password@ip-address:port/database_name/`
+  - You can access the `ip-address` by Inspecting **`docker inspect mongo` > NetworkSettings > Networks > {networkName}_default > IPAddress **
+  - Here docker compose creates a network so that all containers can communite within that network. The network is named after project root directory.
+  - `docker network ls` lists all network and you can see a custom network is created by docker-compose, so we have a dns to alllow one docker container to communicate with another container using the name of the container (here it is the name of the serive or container we created for mongo).
 
 
 
