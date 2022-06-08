@@ -225,6 +225,26 @@ volumes:
 
 
 
+
+
+## working with React and Docker
+
+https://medium.com/free-code-camp/create-a-fullstack-react-express-mongodb-app-using-docker-c3e3e21c4074
+
+
+
+
+
+
+
+## Running tests in Docker
+
+https://docs.docker.com/language/nodejs/run-tests/
+
+
+
+
+
 ----
 
 
