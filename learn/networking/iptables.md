@@ -45,3 +45,91 @@ Linux firewall iptables has four default tables. We will list all four along wit
 
 - **Prerouting**
 - **Output**
+
+
+
+### Enable Loopback Traffic
+
+It’s safe to allow traffic from your own system (the localhost). Append the **Input** chain by entering the following:
+
+```
+sudo iptables -A INPUT -i lo -j ACCEPT
+```
+
+
+
+### Delete a rule
+
+```
+sudo iptables -t nat -D POSTROUTING <number>
+```
+
+
+
+## Persisting the changes.
+
+``` sudo apt-get install iptables-persistent```
+
+sudo /etc/init.d/iptables-persistent save 
+sudo /etc/init.d/iptables-persistent reload
+
+```
+iptables-save > /etc/network/iptables.rules
+```
+
+
+
+
+
+## Redirect incoming traffic in hopserver to rds instance
+
+```
+iptables -t nat -A PREROUTING -p tcp --dport 5432 -j DNAT --to-destination <target_private_ip>:5432
+```
+
+### Run the below script to get the new IP address and use a cronjob every 5 secs to check for new IP when rds rotates the private ip.
+```
+new_ip=$(nslookup <rds-endpoint-static>.ap-south-1.rds.amazonaws.com  | awk '/Address: / { print $2 }')
+
+```
+
+or
+
+```
+aws rds describe-db-instances --db-instance-identifier <rds-id> --query 'DBInstances[*].Endpoint.Address' --output text
+
+
+```
+
+
+
+```
+nslookup <rds-endpoint-static>.ap-south-1.rds.amazonaws.com  | awk '/Address: / { print $2 }'
+
+
+### WIP progress bash script
+```
+#current_ip=$(iptables -t nat -L PREROUTING -n --line-numbers | grep 5432 | awk '{print $8}' | cut -d ':' -f1)
+#new_ip=$(aws rds describe-db-instances --db-instance-identifier <rds-instance-identifier> --query 'DBInstances[*].Endpoint.Address' --output text)
+#
+#if [ "$current_ip" != "$new_ip" ]; then
+#           iptables -t nat -A PREROUTING -p tcp --dport 5432 -j DNAT --to-destination $new_ip:5432
+#               service iptables save
+#fi
+
+current_ip=$(cat rds_private_ip.txt)
+new_ip=$(nslookup <rds-static-endpoint>.ap-south-1.rds.amazonaws.com  | awk '/Address: / { print $2 }')
+
+if [ "$current_ip" != "$new_ip" ]; then
+       
+        service iptables save
+fi
+
+```
+
+```
+
+
+
+https://www.cyberciti.biz/faq/howto-iptables-show-nat-rules/
+
