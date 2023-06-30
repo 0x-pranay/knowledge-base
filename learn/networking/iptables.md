@@ -109,13 +109,6 @@ nslookup <rds-endpoint-static>.ap-south-1.rds.amazonaws.com  | awk '/Address: / 
 
 ### WIP progress bash script
 ```
-#current_ip=$(iptables -t nat -L PREROUTING -n --line-numbers | grep 5432 | awk '{print $8}' | cut -d ':' -f1)
-#new_ip=$(aws rds describe-db-instances --db-instance-identifier <rds-instance-identifier> --query 'DBInstances[*].Endpoint.Address' --output text)
-#
-#if [ "$current_ip" != "$new_ip" ]; then
-#           iptables -t nat -A PREROUTING -p tcp --dport 5432 -j DNAT --to-destination $new_ip:5432
-#               service iptables save
-#fi
 
 current_ip=$(cat rds_private_ip.txt)
 new_ip=$(nslookup <rds-static-endpoint>.ap-south-1.rds.amazonaws.com  | awk '/Address: / { print $2 }')
@@ -133,3 +126,33 @@ fi
 
 https://www.cyberciti.biz/faq/howto-iptables-show-nat-rules/
 
+
+
+
+
+-----
+
+
+
+```
+sudo iptables -t nat -A POSTROUTING -p tcp --dport 5432 -d 10.10.xx.xxx -j SNAT --to-source 10.10.xx.xxx
+
+
+sudo iptables -t nat -A PREROUTING -p tcp --dport 5432 -j DNAT --to-destination 10.10.xx.xxx:5432
+
+```
+
+
+
+
+
+## Cronjob
+
+- list cron jobs
+  - `crontab -l`
+  - `sudo crontab -l`
+- Create a new cron job
+  - `crontab -e` for current user
+  - `sudo crontab -e` for root user
+  - `/home/ubuntu/scripts/pranay/update_iptable_for_rds.sh`
+  - `*/5 * * * * /bin/sh /home/ubuntu/scripts/pranay/update_iptable_for_rds.sh` 

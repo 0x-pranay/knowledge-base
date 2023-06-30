@@ -24,8 +24,17 @@ SELECT CURRENT_ROLE;
 
     ```postgresql
     CREATE USER nodejs_user PASSWORD '****'
+    
     ```
-
+    
+  - Update an exising password for a user
+  
+    ```sql
+    ALTER USER user_name WITH PASSWORD 'new_password';
+    
+    ```
+  
+    
 
 # Privileges
 

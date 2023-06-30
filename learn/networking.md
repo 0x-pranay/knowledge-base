@@ -26,14 +26,11 @@ The below command open local post 5433 and forward to 5432 on hopserver.
 `-N` 		not to execute a remote command. 
 
 ```
-ssh -L 5433:<rds_endpoint | ip_address>:5432 -N ubuntu@hopserver.example.com
+ssh -L 5433:<rds_endpoint | ip_address>:5432 -N ubuntu@remote_bastion.example.com
 ```
 
 Connecting to postgres from local machine through port forwarding
 
 ```
-psql -h 127.0.0.1 -p 5433 -d lightmetrics -U pranay -W
+psql -h 127.0.0.1 -p 5433 -d <databasename> -U <username> -W
 ```
-
-
-
