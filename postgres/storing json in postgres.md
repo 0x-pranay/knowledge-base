@@ -62,4 +62,18 @@ https://www.postgresql.org/docs/12/functions-json.html
   RETURNING *
   ```
 
+
+
+
+- Aggregate multiple objects containing key and values in to a rows where each row contiains key and sum(values) as columns
+
+  ``` sql
+  SELECT KEY, SUM(VALUE::int) 
+  FROM (
+      SELECT KEY, VALUE FROM EVENT_SUMMARY, JSONB_EACH(EVENT_SUMMARY.EVENT_JSONB)
+  )X
+  GROUP BY KEY
+  
+  ```
+
   

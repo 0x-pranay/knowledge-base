@@ -23,7 +23,7 @@ SELECT CURRENT_ROLE;
   - Create a new role
 
     ```postgresql
-    CREATE USER nodejs_user PASSWORD '****'
+    CREATE USER nodejs_user WITH PASSWORD '****'
     
     ```
     

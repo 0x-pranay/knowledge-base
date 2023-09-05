@@ -1,0 +1,5 @@
+- Use connection pool between all server-db interactions
+- check for caching 
+- Prefer Soft deletes
+  - prefer updating instead of delete and insert to prevent btree rebalances
+  - 

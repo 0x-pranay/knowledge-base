@@ -1,3 +1,9 @@
+https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html
+
+
+
+
+
 ## How iptables Work
 
 Network traffic is made up of packets. Data is broken up into smaller pieces (called packets), sent over a network, then put back together. Iptables identifies the packets received and then uses a set of rules to decide what to do with them.
